@@ -5,7 +5,28 @@ using UnityEngine;
 public class Route : MonoBehaviour
 {
     Transform[] childObjects;
-    public List<Transform> childNodeList = new List<Transform>();
+    Queue<Stone> stones;
+    bool isBusy = false;
+
+    public List<Transform> childNodeList;
+
+    void Start() {
+        Stone[] stonesInScene = FindObjectsOfType<Stone>();
+        stones = new Queue<Stone>(stonesInScene);
+    }
+
+    void Update() {
+        if (Input.GetKeyDown(KeyCode.Space) && !isBusy)
+        {
+            Next();
+        }    
+    }
+
+    void Next(){
+        Stone currentStone = stones.Dequeue();
+        stones.Enqueue(currentStone);
+        StartCoroutine(currentStone.Move(currentStone, this, 3));
+    }
 
     void OnDrawGizmos()
     {
@@ -38,5 +59,7 @@ public class Route : MonoBehaviour
             }
         }
     }
+
+
 
 }

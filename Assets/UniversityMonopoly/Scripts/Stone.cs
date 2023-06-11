@@ -4,35 +4,11 @@ using UnityEngine;
 
 public class Stone : MonoBehaviour
 {
-    public Route currentRoute;
 
-    int routePosition;
-
-
-    public int steps;
-
+    public int routePosition;
     bool isMoving;
 
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space) && !isMoving)
-        {
-            steps = Random.Range(1, 7);
-            Debug.Log("Dice Rolled " + steps);
-
-            StartCoroutine(Move());
-            //if (routePosition + steps < currentRoute.childNodeList.Count)
-            //{
-            //    StartCoroutine(Move());
-            //}
-            //else
-            //{
-            //    Debug.Log("Rolled Number is to high");
-            //}
-        }
-    }
-
-    IEnumerator Move()
+    public IEnumerator Move(Stone stone, Route route, int steps)
     {
         if (isMoving)
         {
@@ -43,21 +19,20 @@ public class Stone : MonoBehaviour
         while (steps > 0)
         {
 
-            routePosition++;
-            routePosition %= currentRoute.childNodeList.Count;
+            stone.routePosition++;
+            stone.routePosition %= route.childNodeList.Count;
 
-            Vector3 nextPos = currentRoute.childNodeList[routePosition].position;
+            Vector3 nextPos = route.childNodeList[stone.routePosition].position;
             while (MoveToNextNode(nextPos)) { yield return null; }
 
             yield return new WaitForSeconds(0.1f);
             steps--;
-            //routePosition++;
 
         }
 
         isMoving = false;
     }
-
+    
     bool MoveToNextNode(Vector3 goal)
     {
         return goal != (transform.position = Vector3.MoveTowards(transform.position, goal, 2f * Time.deltaTime));
