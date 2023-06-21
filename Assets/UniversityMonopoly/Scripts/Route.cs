@@ -4,35 +4,19 @@ using UnityEngine;
 
 public class Route : MonoBehaviour
 {
-    Transform[] childObjects;
-    Queue<Stone> stones;
-    bool isBusy = false;
-
     public List<Transform> childNodeList;
+    Transform[] childObjects;
 
-    void Start() {
-        Stone[] stonesInScene = FindObjectsOfType<Stone>();
-        stones = new Queue<Stone>(stonesInScene);
-    }
-
-    void Update() {
-        if (Input.GetKeyDown(KeyCode.Space) && !isBusy)
-        {
-            Next();
-        }    
-    }
-
-    void Next(){
-        Stone currentStone = stones.Dequeue();
-        stones.Enqueue(currentStone);
-        StartCoroutine(currentStone.Move(currentStone, this, 3));
+    void Start()
+    {
+        FillNodes();
     }
 
     void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
 
-        FillNodes();
+        if (childNodeList.Count == 0) { FillNodes(); }
 
         for (int i = 0; i < childNodeList.Count; i++)
         {

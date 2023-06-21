@@ -37,8 +37,8 @@ Material:
     - __dirty: 0
     m_Colors:
     - _HorizonLineColor: {r: 0.764151, g: 0.14898534, b: 0.74188256, a: 1}
-    - _SkyGradientBottom: {r: 0.45917878, g: 0.57069385, b: 0.6698113, a: 1}
-    - _SkyGradientTop: {r: 0.1990625, g: 0.37597618, b: 0.5188679, a: 0}
+    - _SkyGradientBottom: {r: 0.37068352, g: 0.5411936, b: 0.7647059, a: 1}
+    - _SkyGradientTop: {r: 0.14097543, g: 0.2303706, b: 0.3018868, a: 1}
     - _SunDiscColor: {r: 1, g: 0.7391862, b: 0.4009434, a: 1}
     - _SunHaloColor: {r: 1, g: 0.5481836, b: 0, a: 1}
   m_BuildTextureStacks: []
