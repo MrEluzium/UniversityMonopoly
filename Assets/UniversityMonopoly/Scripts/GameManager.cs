@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using System.Diagnostics;
 using UnityEngine;
 using TMPro;
 
@@ -38,15 +39,17 @@ public class GameManager : MonoBehaviour
         switch (gameState)
         {
             case GameState.Menu:
-                camera.transform.LookAt(centerAnchor.transform);
                 camera.transform.Translate(Vector3.right * Time.deltaTime);
                 break;
             case GameState.GameStarted:
-                camera.transform.LookAt(cameraAnchor.transform);
-                Vector3 newCameraPos = new Vector3(currentPawn.cameraPoint.x, camera.transform.position.y , currentPawn.cameraPoint.z);
-                camera.transform.position = newCameraPos;
+                if (currentPawn.isMoving)
+                {
+                    Vector3 newCameraPos = new Vector3(currentPawn.cameraPoint.x, camera.transform.position.y , currentPawn.cameraPoint.z);
+                    camera.transform.position = newCameraPos;
+                }
                 break;
         }
+        camera.transform.LookAt(cameraAnchor.transform);
 
         if (Input.GetKeyDown(KeyCode.Space) && gameState == GameState.GameStarted && !currentPawn.isMoving && !isBusy)
         {
@@ -59,16 +62,25 @@ public class GameManager : MonoBehaviour
         diceText.enabled = true;
         diceText.text = "";
         gameState = GameState.GameStarted;
+
+        Animation cameraAnchorAnim = cameraAnchor.GetComponent<Animation>();
+        cameraAnchorAnim.Play();
+
+        Vector3 newCameraPos = new Vector3(currentPawn.cameraPoint.x, camera.transform.position.y , currentPawn.cameraPoint.z);
+        StartCoroutine(MoveCamera(newCameraPos));
     }
 
-    void Next(){
+    void Next()
+    {
         currentPawn = pawns.Dequeue();
         pawns.Enqueue(currentPawn);
+        Vector3 newCameraPos = new Vector3(currentPawn.cameraPoint.x, camera.transform.position.y , currentPawn.cameraPoint.z);
+        StartCoroutine(MoveCamera(newCameraPos));
         StartCoroutine(RollTheDice());
     }
 
     private IEnumerator RollTheDice()
-     {
+    {
         isBusy = true;
         int randomDiceSide = 0;
         int finalSide = 0;
@@ -88,5 +100,31 @@ public class GameManager : MonoBehaviour
         StartCoroutine(currentPawn.Move(currentPawn, route, finalSide));
         isBusy = false;
 		yield return null;
+    }
+
+    private IEnumerator MoveCamera(Vector3 endPosition)
+    {
+        if (isBusy)
+        {
+            yield break;
+        }
+        // isBusy = true;
+
+        Vector3 startPosition = camera.transform.position;
+        Stopwatch stopWatch = new Stopwatch();
+        stopWatch.Start();
+
+        double elipsedTime = 0;
+        float alpha = 0;
+        while (alpha < 1)
+        {
+            elipsedTime = stopWatch.Elapsed.TotalSeconds;
+            alpha = (float)elipsedTime / 2.0f;
+            UnityEngine.Debug.Log(alpha);
+            camera.transform.position = Vector3.Lerp(startPosition, endPosition, Mathf.SmoothStep(0, 1, alpha));
+            camera.transform.LookAt(cameraAnchor.transform);
+            yield return null;
+        }
+        stopWatch.Stop();
     }
 }
