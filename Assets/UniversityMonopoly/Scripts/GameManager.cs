@@ -73,12 +73,14 @@ public class GameManager : MonoBehaviour
         int randomDiceSide = 0;
         int finalSide = 0;
         float delay = 0;
+        float totalTime = 0;
 
-        for (int i = 0; i <= 30; i++)
+        while (totalTime < 2.5f)
         {
+            delay += Time.deltaTime;
             randomDiceSide = Random.Range(0, 5);
             diceText.text = (randomDiceSide + 1).ToString();
-            delay += Time.deltaTime;
+            totalTime += Time.deltaTime + delay;
             yield return new WaitForSeconds(delay);
         }
         finalSide = randomDiceSide + 1;
