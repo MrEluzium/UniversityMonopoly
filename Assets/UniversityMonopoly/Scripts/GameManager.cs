@@ -85,14 +85,17 @@ public class GameManager : MonoBehaviour
         int randomDiceSide = 0;
         int finalSide = 0;
         float delay = 0;
-        float totalTime = 0;
+        double totalTime = 0;
+
+        Stopwatch stopWatch = new Stopwatch();
+        stopWatch.Start();
 
         while (totalTime < 2.5f)
         {
-            delay += Time.deltaTime;
+            totalTime = stopWatch.Elapsed.TotalSeconds;
+            delay += .005f;
             randomDiceSide = Random.Range(0, 5);
             diceText.text = (randomDiceSide + 1).ToString();
-            totalTime += Time.deltaTime + delay;
             yield return new WaitForSeconds(delay);
         }
         finalSide = randomDiceSide + 1;
@@ -104,18 +107,13 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator MoveCamera(Vector3 endPosition)
     {
-        if (isBusy)
-        {
-            yield break;
-        }
-        // isBusy = true;
-
         Vector3 startPosition = camera.transform.position;
+        double elipsedTime = 0;
+        float alpha = 0;
+
         Stopwatch stopWatch = new Stopwatch();
         stopWatch.Start();
 
-        double elipsedTime = 0;
-        float alpha = 0;
         while (alpha < 1)
         {
             elipsedTime = stopWatch.Elapsed.TotalSeconds;
