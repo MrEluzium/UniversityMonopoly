@@ -118,7 +118,6 @@ public class GameManager : MonoBehaviour
         {
             elipsedTime = stopWatch.Elapsed.TotalSeconds;
             alpha = (float)elipsedTime / 2.0f;
-            UnityEngine.Debug.Log(alpha);
             camera.transform.position = Vector3.Lerp(startPosition, endPosition, Mathf.SmoothStep(0, 1, alpha));
             camera.transform.LookAt(cameraAnchor.transform);
             yield return null;

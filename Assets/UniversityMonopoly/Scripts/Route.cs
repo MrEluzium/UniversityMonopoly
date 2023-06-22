@@ -5,7 +5,6 @@ using UnityEngine;
 public class Route : MonoBehaviour
 {
     public List<Transform> childNodeList;
-    Transform[] childObjects;
 
     void Start()
     {
@@ -32,8 +31,7 @@ public class Route : MonoBehaviour
     void FillNodes()
     {
         childNodeList.Clear();
-
-        childObjects = GetComponentsInChildren<Transform>();
+        Transform[] childObjects = GetComponentsInChildren<Transform>();
 
         foreach (Transform child in childObjects)
         {

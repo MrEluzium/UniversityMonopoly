@@ -31,6 +31,13 @@ public class Pawn : MonoBehaviour
             // pawn.routePosition %= route.childNodeList.Count;
 
             Vector3 nextPos = new Vector3();
+
+            // pawn must continue the path after reaching last hex
+            if (pawn.routePosition > (route.childNodeList.Count - 1))
+            {
+                pawn.routePosition -= route.childNodeList.Count;
+            }
+
             nextPos.x = route.childNodeList[pawn.routePosition].position.x + pawn.offset.x;
             nextPos.y = 2.22f;
             nextPos.z = route.childNodeList[pawn.routePosition].position.z + pawn.offset.y;
