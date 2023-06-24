@@ -4,15 +4,21 @@ using UnityEngine;
 
 public class RouteHex : MonoBehaviour
 {
-    // Start is called before the first frame update
+    public bool isOpen = false;
+
+    Animator animator;
+
     void Start()
     {
-        
+        animator = GetComponent<Animator>();    
     }
 
-    // Update is called once per frame
-    void Update()
+    public void FlipToOpen()
     {
-        
+        if (!isOpen)
+        {
+            isOpen = true;
+            animator.Play("HexFlipOpen");
+        }
     }
 }

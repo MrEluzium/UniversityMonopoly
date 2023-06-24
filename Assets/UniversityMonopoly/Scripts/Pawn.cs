@@ -5,7 +5,7 @@ using UnityEngine;
 public class Pawn : MonoBehaviour
 {
 
-    public int routePosition = 0;
+    public int routePosition = 1;
     public Vector2 offset;
     public GameObject anchor;
     public Vector3 cameraPoint;
@@ -13,7 +13,7 @@ public class Pawn : MonoBehaviour
 
     void Update() {
         transform.LookAt(anchor.transform);
-        cameraPoint = transform.TransformPoint(new Vector3(0, 0, -2f));
+        cameraPoint = transform.TransformPoint(new Vector3(0, .2f, -2f));
     }
 
     public IEnumerator Move(Pawn pawn, Route route, int steps)
@@ -33,13 +33,13 @@ public class Pawn : MonoBehaviour
             Vector3 nextPos = new Vector3();
 
             // pawn must continue the path after reaching last hex
-            if (pawn.routePosition > (route.childNodeList.Count - 1))
+            if (pawn.routePosition >= route.childNodeList.Count)
             {
                 pawn.routePosition -= route.childNodeList.Count;
             }
 
             nextPos.x = route.childNodeList[pawn.routePosition].position.x + pawn.offset.x;
-            nextPos.y = 2.22f;
+            nextPos.y = 2.12f;
             nextPos.z = route.childNodeList[pawn.routePosition].position.z + pawn.offset.y;
 
             // Vector3 nextPos = route.childNodeList[pawn.routePosition].position;

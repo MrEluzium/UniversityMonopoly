@@ -24,9 +24,12 @@ public class MainMenu : MonoBehaviour
         Application.Quit();
     }
 
-    private void PlayAnimation(string animationName) {    
-        foreach(AnimationState state in animations) {
-            if (state.name == animationName) {
+    private void PlayAnimation(string animationName) 
+    {    
+        foreach(AnimationState state in animations) 
+        {
+            if (state.name == animationName) 
+            {
                 animations.Play(state.name);      
                 break;
             }
