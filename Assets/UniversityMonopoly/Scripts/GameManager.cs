@@ -5,6 +5,18 @@ using System.Diagnostics;
 using UnityEngine;
 using TMPro;
 
+using Random = System.Random;
+
+public enum EventType
+{
+    Gain,
+    Debuff,
+    Guile,
+    Rest,
+    Class,
+    Exam
+}
+
 public class GameManager : MonoBehaviour
 {
     public enum GameState
@@ -24,8 +36,12 @@ public class GameManager : MonoBehaviour
 
     Queue<Pawn> pawns;
     Pawn currentPawn;
+    EventData currentEventData;
     bool isCameraMoving = false;
     bool isDiceRolling = false;
+    bool isEventActionsPending = false;
+
+    static Random random = new System.Random();
 
     void OnEnable() 
     {
@@ -58,7 +74,7 @@ public class GameManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (gameState == GameState.GameStarted && !currentPawn.isMoving && !isDiceRolling && !isCameraMoving)
+            if (gameState == GameState.GameStarted && !currentPawn.isMoving && !isDiceRolling && !isCameraMoving && !isEventActionsPending)
             {
                 Next();
             }
@@ -77,6 +93,7 @@ public class GameManager : MonoBehaviour
         Animation cameraAnchorAnim = cameraAnchor.GetComponent<Animation>();
         cameraAnchorAnim.Play();
 
+        hud.SetMainText("Нажмите пробел, чтобы сделать ход");
         hud.ShowPlayersPanel();
 
         Vector3 newCameraPos = new Vector3(currentPawn.cameraPoint.x, camera.transform.position.y, currentPawn.cameraPoint.z);
@@ -87,25 +104,131 @@ public class GameManager : MonoBehaviour
     {
         currentPawn = pawns.Dequeue();
         pawns.Enqueue(currentPawn);
-        Vector3 newCameraPos = new Vector3(currentPawn.cameraPoint.x, camera.transform.position.y, currentPawn.cameraPoint.z);
-        StartCoroutine(MoveCamera(newCameraPos));
-        StartCoroutine(RollTheDice());
+        if (currentPawn.turnsToPass != 0) {
+            currentPawn.turnsToPass -= 1;
+            Next();
+        } else {
+            Vector3 newCameraPos = new Vector3(currentPawn.cameraPoint.x, camera.transform.position.y, currentPawn.cameraPoint.z);
+            StartCoroutine(MoveCamera(newCameraPos));
+            StartCoroutine(RollTheDice());
+        }
     }
 
     void OnMovementDone(Pawn pawn)
     {
+        currentPawn = pawn;
         if (!pawn.currentHex.isOpen)
         {
             pawn.animator.Play("PawnJumpOnSpot");
             pawn.currentHex.FlipToOpen();
         }
 
+        switch (pawn.currentHex.eventType)
+        {
+            case EventType.Rest:
+                hud.SetMainText("Отдых (+мана)");
+                pawn.incrementMana(1);
+                break;
+            case EventType.Class:
+                hud.SetMainText("Пара (+знания)");
+                pawn.incrementKnowledge(1);
+                break;
+            case EventType.Exam:
+                int examKnowledgeRequirements = 10;
+                if (pawn.splitExamRequirements) { examKnowledgeRequirements = 5; }
+
+                if (pawn.knowledge >= examKnowledgeRequirements)
+                {
+                    pawn.knowledge -= examKnowledgeRequirements;
+                    pawn.passedExams += 1;
+                    if (pawn.passedExams == 3)
+                    {
+                        hud.SetMainText("Экзамен! Ты сдал свой " + pawn.passedExams.ToString() + " экзамен. Это победа!");
+                        gameState = GameState.Menu;
+                    }
+                    else 
+                    {
+                        hud.SetMainText("Экзамен! Ты сдал свой " + pawn.passedExams.ToString() + " экзамен. Осталось еще " + (3 - pawn.passedExams).ToString());
+                    }
+                }
+                else
+                {
+                    hud.SetMainText("Экзамен! Тебе не хватает " + (examKnowledgeRequirements - pawn.knowledge).ToString() + " очков знаний");
+                }
+                break;
+            default:
+                StartEventOfType(pawn.currentHex.eventType);
+                break;
+            
+        }
+    }
+
+    void StartEventOfType(EventType type)
+    {
+        List<EventData> eventsList = new List<EventData>();
+
+        switch (type)
+        {
+            case EventType.Gain:
+                eventsList = eventManager.gainEvents;
+                break;
+            case EventType.Debuff:
+                eventsList = eventManager.debuffEvents;
+                break;
+            case EventType.Guile:
+                eventsList = eventManager.guileEvents;
+                break;
+        }
+
+        if(eventsList.Count > 0)
+        {
+            isEventActionsPending = true;
+            EventData eventData = eventsList[random.Next(eventsList.Count)];
+            currentEventData = eventData;
+
+            if (currentPawn.mana + eventData.abilities[0].manaV < 0) 
+            { 
+                hud.DisableFirstButton(); 
+            } else { 
+                hud.EnableFirstButton(); 
+            }
+            
+            if (currentPawn.mana + eventData.abilities[1].manaV < 0) 
+            { 
+                hud.DisableSecondButton();
+            } else { 
+                hud.EnableSecondButton(); 
+            }
+
+            hud.SetMainText(eventData.description);
+            hud.SetFirstButtonText(eventData.abilities[0].text);
+            hud.SetSecondButtonText(eventData.abilities[1].text);
+            hud.ShowButtons();
+        }
+    }
+
+    public void OnActionButtonAnswer(int buttonIndex)
+    {
+        EventAbilityData eventAbility = currentEventData.abilities[buttonIndex];
+
+        if (eventAbility.diceRerollAmount == 1)
+        {
+            StartCoroutine(RollTheDice());
+        }
+        currentPawn.ApplyEventAbility(eventAbility);
         
+        hud.DisableFirstButton();
+        hud.DisableSecondButton();
+        hud.SetMainText("");
+        hud.HideButtons();
+        isEventActionsPending = false;
     }
 
     private IEnumerator RollTheDice()
     {
         isDiceRolling = true;
+
+        hud.SetMainText("");
         int randomDiceSide = 0;
         int finalSide = 0;
         float delay = 0;
@@ -118,13 +241,25 @@ public class GameManager : MonoBehaviour
         {
             totalTime = stopWatch.Elapsed.TotalSeconds;
             delay += .005f;
-            randomDiceSide = Random.Range(0, 5);
-            hud.SetDiceText((randomDiceSide + 1).ToString());
+            randomDiceSide = random.Next(6) + 1;
+            hud.SetDiceText(randomDiceSide.ToString());
             yield return new WaitForSeconds(delay);
         }
-        finalSide = randomDiceSide + 1;
 
-        StartCoroutine(currentPawn.Move(currentPawn, route, finalSide));
+        int finalSteps = randomDiceSide + currentPawn.diceRollBuff;
+        hud.SetDiceText(finalSteps.ToString());
+
+        if (currentPawn.diceRollLenth > 1)
+        {
+            currentPawn.diceRollLenth -= 1;
+        }
+        else if (currentPawn.diceRollLenth == 1)
+        {
+            currentPawn.diceRollLenth = 0;
+            currentPawn.diceRollBuff = 0;
+        }
+
+        StartCoroutine(currentPawn.Move(currentPawn, route, 50));
         isDiceRolling = false;
 		yield return null;
     }
@@ -148,11 +283,6 @@ public class GameManager : MonoBehaviour
             yield return null;
         }
         stopWatch.Stop();
-
-        if(hud.mainText.text == "")
-        {
-            hud.SetMainText("Нажмите пробел, чтобы сделать ход");
-        }
 
         isCameraMoving = false;
     }

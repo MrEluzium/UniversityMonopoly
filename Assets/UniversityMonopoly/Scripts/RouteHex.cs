@@ -2,16 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum EventType
-{
-    Gain,
-    Debuff,
-    Guile,
-    Rest,
-    Class,
-    Exam
-}
-
 public class RouteHex : MonoBehaviour
 {
     public EventManager eventManager;

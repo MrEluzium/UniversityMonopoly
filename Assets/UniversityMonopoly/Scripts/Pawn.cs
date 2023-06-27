@@ -1,9 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class Pawn : MonoBehaviour
 {
+    public TextMeshProUGUI manaText;
+    public TextMeshProUGUI knowledgeText;
     public int routePosition = 1;
     public bool isMoving;
     public Vector2 offset;
@@ -11,13 +14,14 @@ public class Pawn : MonoBehaviour
     public Vector3 cameraPoint;
     public RouteHex currentHex;
 
-    public float mana;
+    public int mana;
     public float knowledge;
+    public int passedExams;
     public int diceRollBuff;
     public int diceRollLenth;
     public int turnsToPass;
-    public float examRequirementsMultiplier;
-    public float knowledgeMultiplaier;
+    public bool splitExamRequirements = false;
+    // public float knowledgeMultiplaier = 1f;
 
     public Animator animator;
 
@@ -33,6 +37,35 @@ public class Pawn : MonoBehaviour
     {
         transform.LookAt(anchor.transform);
         cameraPoint = transform.TransformPoint(new Vector3(0, .2f, -2f));
+    }
+
+    public void incrementMana(int addMana)
+    {
+        mana += addMana;
+        if (mana < 0) { mana = 0; }
+        SetManaText(mana);
+    }
+
+    public void incrementKnowledge(float addKnowledge)
+    {
+        knowledge += addKnowledge;
+        if (knowledge < 0f) { knowledge = 0f; }
+        SetKnowledgeText(knowledge);
+    }
+
+    public void ApplyEventAbility(EventAbilityData eventAbility)
+    {
+        incrementMana(eventAbility.manaV);
+
+        if (eventAbility.diceRollBuff != 0) { diceRollBuff = eventAbility.diceRollBuff; }
+        
+        if (eventAbility.diceRollLenth != 0) { diceRollLenth = eventAbility.diceRollLenth; }
+        
+        if (eventAbility.turnsToPass != 0) { turnsToPass = eventAbility.turnsToPass; }
+        
+        if (eventAbility.examRequirementsMultiplier != 0f) { splitExamRequirements = true; }
+        
+        // if (eventAbility.knowledgeMultiplaier != 0f) { knowledgeMultiplaier = eventAbility.knowledgeMultiplaier; }
     }
 
     public IEnumerator Move(Pawn pawn, Route route, int steps)
@@ -68,7 +101,7 @@ public class Pawn : MonoBehaviour
             yield return new WaitForSeconds(0.1f);
             currentHex = route.childNodeList[pawn.routePosition].gameObject.GetComponentsInChildren<RouteHex>()[0];
             steps--;
-
+            if (currentHex.eventType == EventType.Exam) { steps = 0; }
         }
 
         isMoving = false;
@@ -78,6 +111,16 @@ public class Pawn : MonoBehaviour
     bool MoveToNextNode(Vector3 goal)
     {
         return goal != (transform.position = Vector3.MoveTowards(transform.position, goal, 2f * Time.deltaTime));
+    }
+
+    void SetManaText(int newManaAmount)
+    {
+        manaText.text = "Мана: " + newManaAmount.ToString();
+    }
+
+    void SetKnowledgeText(float newKnowledgeAmount)
+    {
+        knowledgeText.text = "Знания: " + newKnowledgeAmount.ToString();
     }
 
     void OnDrawGizmos()

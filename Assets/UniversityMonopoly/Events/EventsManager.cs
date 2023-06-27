@@ -91,20 +91,20 @@ public class EventManager : MonoBehaviour
         );
 
         // Debuff #1
-        EventAbilityData debuffOneOne = new EventAbilityData();
-        debuffOneOne.text = "Пойти на пары (-2 к шагу на два хода)";
-        debuffOneOne.diceRollBuff = -2;
-        debuffOneOne.diceRollLenth = 2;
+        // EventAbilityData debuffOneOne = new EventAbilityData();
+        // debuffOneOne.text = "Пойти на пары (-2 к шагу на два хода)";
+        // debuffOneOne.diceRollBuff = -2;
+        // debuffOneOne.diceRollLenth = 2;
 
-        EventAbilityData debuffOneTwo = new EventAbilityData();
-        debuffOneTwo.text = "Забить (-50% к получению знаний на следующей паре)";
-        debuffOneTwo.knowledgeMultiplaier = .5f;
+        // EventAbilityData debuffOneTwo = new EventAbilityData();
+        // debuffOneTwo.text = "Забить (-50% к получению знаний на следующей паре)";
+        // debuffOneTwo.knowledgeMultiplaier = .5f;
 
-        debuffEvents.Add(new EventData(
-            "Вы вечером решили сыграть в игру перед экзаменом, потеряв счёт времени вы уснули в 5 часов ночи, вы спали 2 часа", 
-            debuffOneOne, 
-            debuffOneTwo)
-        );
+        // debuffEvents.Add(new EventData(
+        //     "Вы вечером решили сыграть в игру перед экзаменом, потеряв счёт времени вы уснули в 5 часов ночи, вы спали 2 часа", 
+        //     debuffOneOne, 
+        //     debuffOneTwo)
+        // );
 
         // Debuff #2
         // EventAbilityData debuffTwoOne = new EventAbilityData();
@@ -123,8 +123,8 @@ public class EventManager : MonoBehaviour
 
         // Debuff #3
         EventAbilityData debuffThreeOne = new EventAbilityData();
-        debuffThreeOne.text = "Это не может быть правдой (-мана)";
-        debuffThreeOne.manaV = -1;
+        debuffThreeOne.text = "Это не может быть правдой (пропуск хода)";
+        debuffThreeOne.turnsToPass = 1;
 
         EventAbilityData debuffThreeTwo = new EventAbilityData();
         debuffThreeTwo.text = "В этот раз я отступлю (-мана)";
