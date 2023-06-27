@@ -10,8 +10,17 @@ public class Pawn : MonoBehaviour
     public GameObject anchor;
     public Vector3 cameraPoint;
     public bool isMoving;
+    public RouteHex currentHex;
 
-    void Update() {
+    Animator animator;
+
+    void Start()
+    {
+        animator = GetComponentsInChildren<Animator>()[0];    
+    }
+
+    void Update()
+    {
         transform.LookAt(anchor.transform);
         cameraPoint = transform.TransformPoint(new Vector3(0, .2f, -2f));
     }
@@ -51,6 +60,14 @@ public class Pawn : MonoBehaviour
         }
 
         isMoving = false;
+
+        currentHex = route.childNodeList[pawn.routePosition].gameObject.GetComponentsInChildren<RouteHex>()[0];
+
+        if (!currentHex.isOpen)
+        {
+            animator.Play("PawnJumpOnSpot");
+            currentHex.FlipToOpen();
+        }
     }
     
     bool MoveToNextNode(Vector3 goal)

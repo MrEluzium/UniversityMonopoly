@@ -66,7 +66,7 @@ public class GameManager : MonoBehaviour
         Animation cameraAnchorAnim = cameraAnchor.GetComponent<Animation>();
         cameraAnchorAnim.Play();
 
-        Vector3 newCameraPos = new Vector3(currentPawn.cameraPoint.x, camera.transform.position.y , currentPawn.cameraPoint.z);
+        Vector3 newCameraPos = new Vector3(currentPawn.cameraPoint.x, camera.transform.position.y, currentPawn.cameraPoint.z);
         StartCoroutine(MoveCamera(newCameraPos));
     }
 
@@ -74,7 +74,7 @@ public class GameManager : MonoBehaviour
     {
         currentPawn = pawns.Dequeue();
         pawns.Enqueue(currentPawn);
-        Vector3 newCameraPos = new Vector3(currentPawn.cameraPoint.x, camera.transform.position.y , currentPawn.cameraPoint.z);
+        Vector3 newCameraPos = new Vector3(currentPawn.cameraPoint.x, camera.transform.position.y, currentPawn.cameraPoint.z);
         StartCoroutine(MoveCamera(newCameraPos));
         StartCoroutine(RollTheDice());
     }
