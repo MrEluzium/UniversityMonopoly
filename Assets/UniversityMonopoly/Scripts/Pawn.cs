@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Pawn : MonoBehaviour
 {
-
     public int routePosition = 1;
     public bool isMoving;
     public Vector2 offset;
@@ -14,6 +13,11 @@ public class Pawn : MonoBehaviour
 
     public float mana;
     public float knowledge;
+    public int diceRollBuff;
+    public int diceRollLenth;
+    public int turnsToPass;
+    public float examRequirementsMultiplier;
+    public float knowledgeMultiplaier;
 
     public Animator animator;
 

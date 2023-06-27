@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Monopoly test.unity
+    guid: d02ce2569e875d7459a7f544f9045e64
   m_configObjects: {}

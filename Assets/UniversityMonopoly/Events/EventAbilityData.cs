@@ -9,5 +9,7 @@ public struct EventAbilityData
     public int diceRerollAmount;
     public int diceRollBuff;
     public int diceRollLenth;
-    public int examRequirementsMultiplier;
+    public int turnsToPass;
+    public float examRequirementsMultiplier;
+    public float knowledgeMultiplaier;
 }

@@ -14,16 +14,18 @@ public class GameManager : MonoBehaviour
     }
 
     public Pawn[] players;
+    public GameState gameState;
+    public EventManager eventManager;
+    public HUD hud;
     public Route route;
     public Camera camera;
-    public GameState gameState;
-    public TextMeshProUGUI diceText;
     public GameObject cameraAnchor;
     public GameObject centerAnchor;
 
     Queue<Pawn> pawns;
     Pawn currentPawn;
-    bool isBusy = false;
+    bool isCameraMoving = false;
+    bool isDiceRolling = false;
 
     void OnEnable() 
     {
@@ -34,8 +36,6 @@ public class GameManager : MonoBehaviour
     {
         pawns = new Queue<Pawn>(players);
         currentPawn = pawns.Peek();
-
-        diceText.enabled = false;
     }
 
     void Update()
@@ -56,9 +56,12 @@ public class GameManager : MonoBehaviour
         }
         camera.transform.LookAt(cameraAnchor.transform);
 
-        if (Input.GetKeyDown(KeyCode.Space) && gameState == GameState.GameStarted && !currentPawn.isMoving && !isBusy)
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            Next();
+            if (gameState == GameState.GameStarted && !currentPawn.isMoving && !isDiceRolling && !isCameraMoving)
+            {
+                Next();
+            }
         }  
 
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -69,12 +72,12 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
-        diceText.enabled = true;
-        diceText.text = "";
         gameState = GameState.GameStarted;
 
         Animation cameraAnchorAnim = cameraAnchor.GetComponent<Animation>();
         cameraAnchorAnim.Play();
+
+        hud.ShowPlayersPanel();
 
         Vector3 newCameraPos = new Vector3(currentPawn.cameraPoint.x, camera.transform.position.y, currentPawn.cameraPoint.z);
         StartCoroutine(MoveCamera(newCameraPos));
@@ -91,7 +94,6 @@ public class GameManager : MonoBehaviour
 
     void OnMovementDone(Pawn pawn)
     {
-        isBusy = true;
         if (!pawn.currentHex.isOpen)
         {
             pawn.animator.Play("PawnJumpOnSpot");
@@ -99,13 +101,11 @@ public class GameManager : MonoBehaviour
         }
 
         
-
-        isBusy = false;
     }
 
     private IEnumerator RollTheDice()
     {
-        isBusy = true;
+        isDiceRolling = true;
         int randomDiceSide = 0;
         int finalSide = 0;
         float delay = 0;
@@ -119,18 +119,19 @@ public class GameManager : MonoBehaviour
             totalTime = stopWatch.Elapsed.TotalSeconds;
             delay += .005f;
             randomDiceSide = Random.Range(0, 5);
-            diceText.text = (randomDiceSide + 1).ToString();
+            hud.SetDiceText((randomDiceSide + 1).ToString());
             yield return new WaitForSeconds(delay);
         }
         finalSide = randomDiceSide + 1;
 
         StartCoroutine(currentPawn.Move(currentPawn, route, finalSide));
-        isBusy = false;
+        isDiceRolling = false;
 		yield return null;
     }
 
     private IEnumerator MoveCamera(Vector3 endPosition)
     {
+        isCameraMoving = true;
         Vector3 startPosition = camera.transform.position;
         double elipsedTime = 0;
         float alpha = 0;
@@ -147,5 +148,12 @@ public class GameManager : MonoBehaviour
             yield return null;
         }
         stopWatch.Stop();
+
+        if(hud.mainText.text == "")
+        {
+            hud.SetMainText("Нажмите пробел, чтобы сделать ход");
+        }
+
+        isCameraMoving = false;
     }
 }
