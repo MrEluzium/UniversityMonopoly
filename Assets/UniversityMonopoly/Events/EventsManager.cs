@@ -28,5 +28,21 @@ public class EventManager : MonoBehaviour
             GainOneOne, 
             GainOneTwo)
         );
+
+        EventAbilityData GainTowOne = new EventAbilityData();
+        GainTowOne.text = "Пойти (+2 к ходу на 3 хода, -мана)";
+        GainTowOne.diceRollBuff = 2;
+        GainTowOne.diceRollLenth = 3;
+        GainTowOne.manaV = -1;
+
+        EventAbilityData GainTowTwo = new EventAbilityData();
+        GainTowTwo.text = "Забить";
+
+        events.Add(new EventData(
+            gainMaterial, 
+            "Вы получили возможность пойти на марафон", 
+            GainOneOne, 
+            GainOneTwo)
+        );
     }
 }

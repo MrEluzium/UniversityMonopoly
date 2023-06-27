@@ -15,7 +15,10 @@ public class Pawn : MonoBehaviour
     public float mana;
     public float knowledge;
 
-    Animator animator;
+    public Animator animator;
+
+    public delegate void MovementDone(Pawn pawn);
+    public static event MovementDone OnMovementDone;
 
     void Start()
     {
@@ -50,6 +53,7 @@ public class Pawn : MonoBehaviour
                 pawn.routePosition -= route.childNodeList.Count;
             }
 
+
             nextPos.x = route.childNodeList[pawn.routePosition].position.x + pawn.offset.x;
             nextPos.y = 2.12f;
             nextPos.z = route.childNodeList[pawn.routePosition].position.z + pawn.offset.y;
@@ -58,19 +62,13 @@ public class Pawn : MonoBehaviour
             while (MoveToNextNode(nextPos)) { yield return null; }
 
             yield return new WaitForSeconds(0.1f);
+            currentHex = route.childNodeList[pawn.routePosition].gameObject.GetComponentsInChildren<RouteHex>()[0];
             steps--;
 
         }
 
         isMoving = false;
-
-        currentHex = route.childNodeList[pawn.routePosition].gameObject.GetComponentsInChildren<RouteHex>()[0];
-        if (!currentHex.isOpen)
-        {
-            // currentHex.setSideMaterial();
-            animator.Play("PawnJumpOnSpot");
-            currentHex.FlipToOpen();
-        }
+        OnMovementDone(this);
     }
     
     bool MoveToNextNode(Vector3 goal)

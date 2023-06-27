@@ -25,6 +25,11 @@ public class GameManager : MonoBehaviour
     Pawn currentPawn;
     bool isBusy = false;
 
+    void OnEnable() 
+    {
+        Pawn.OnMovementDone += OnMovementDone;
+    }
+
     void Start()
     {
         pawns = new Queue<Pawn>(players);
@@ -55,6 +60,11 @@ public class GameManager : MonoBehaviour
         {
             Next();
         }  
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
     }
 
     public void StartGame()
@@ -77,6 +87,20 @@ public class GameManager : MonoBehaviour
         Vector3 newCameraPos = new Vector3(currentPawn.cameraPoint.x, camera.transform.position.y, currentPawn.cameraPoint.z);
         StartCoroutine(MoveCamera(newCameraPos));
         StartCoroutine(RollTheDice());
+    }
+
+    void OnMovementDone(Pawn pawn)
+    {
+        isBusy = true;
+        if (!pawn.currentHex.isOpen)
+        {
+            pawn.animator.Play("PawnJumpOnSpot");
+            pawn.currentHex.FlipToOpen();
+        }
+
+        
+
+        isBusy = false;
     }
 
     private IEnumerator RollTheDice()
