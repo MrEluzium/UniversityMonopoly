@@ -6,11 +6,14 @@ public class Pawn : MonoBehaviour
 {
 
     public int routePosition = 1;
+    public bool isMoving;
     public Vector2 offset;
     public GameObject anchor;
     public Vector3 cameraPoint;
-    public bool isMoving;
     public RouteHex currentHex;
+
+    public float mana;
+    public float knowledge;
 
     Animator animator;
 
@@ -62,9 +65,9 @@ public class Pawn : MonoBehaviour
         isMoving = false;
 
         currentHex = route.childNodeList[pawn.routePosition].gameObject.GetComponentsInChildren<RouteHex>()[0];
-
         if (!currentHex.isOpen)
         {
+            // currentHex.setSideMaterial();
             animator.Play("PawnJumpOnSpot");
             currentHex.FlipToOpen();
         }
