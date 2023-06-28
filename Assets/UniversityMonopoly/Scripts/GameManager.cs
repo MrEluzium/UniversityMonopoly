@@ -259,7 +259,7 @@ public class GameManager : MonoBehaviour
             currentPawn.diceRollBuff = 0;
         }
 
-        StartCoroutine(currentPawn.Move(currentPawn, route, 50));
+        StartCoroutine(currentPawn.Move(currentPawn, route, finalSteps));
         isDiceRolling = false;
 		yield return null;
     }
