@@ -14,14 +14,13 @@ public class Settings : MonoBehaviour
     {
         tiltShift.enabled = !tiltShift.enabled;
 
-        switch (tiltShift.enabled)
+        if (tiltShift.enabled)
         {
-            case true:
-                blurCheckbox.sprite = checkboxSprites[0];
-                break;
-            case false:
-                blurCheckbox.sprite = checkboxSprites[1];
-                break;
+            blurCheckbox.sprite = checkboxSprites[0];
+        } 
+        else
+        {
+            blurCheckbox.sprite = checkboxSprites[1];
         }
     }
 }

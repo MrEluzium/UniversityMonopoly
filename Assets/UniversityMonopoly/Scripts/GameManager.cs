@@ -230,7 +230,6 @@ public class GameManager : MonoBehaviour
 
         hud.SetMainText("");
         int randomDiceSide = 0;
-        int finalSide = 0;
         float delay = 0;
         double totalTime = 0;
 
